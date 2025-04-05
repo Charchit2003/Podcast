@@ -1,0 +1,16 @@
+{
+  "name": "express-mongo-api",
+  "version": "1.0.0",
+  "description": "A simple Node.js Express backend with MongoDB integration using Mongoose.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^5.13.23"
+  },
+  "author": "",
+  "license": "ISC"
+}
