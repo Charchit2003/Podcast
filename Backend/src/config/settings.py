@@ -1,10 +1,39 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+# Build paths inside the project
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_FILE = BASE_DIR / '.env.local'
 
-TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-CARTESIA_API_KEY = os.getenv("CARTESIA_API_KEY")
+# Debug print for detailed troubleshooting
+print(f"1. Checking .env.local exists: {ENV_FILE.exists()}")
+print(f"2. File path: {ENV_FILE.absolute()}")
+
+# Load environment variables with enhanced error handling
+try:
+    # Force reload of environment variables
+    load_dotenv(ENV_FILE, override=True)
+    
+    # Get raw environment values
+    raw_together_key = os.environ.get('TOGETHER_API_KEY')
+    print(f"3. Raw TOGETHER_API_KEY: {raw_together_key and len(raw_together_key) > 0}")
+    
+except Exception as e:
+    print(f"Error loading .env.local: {e}")
+
+# Get API keys with fallback values
+TOGETHER_API_KEY = os.getenv('TOGETHER_API_KEY')
+if not TOGETHER_API_KEY:
+    TOGETHER_API_KEY = '7217a6223e2579c599721537a26ddb21652d2777fd8f96791513e0b4231ef11b'
+    print("4. Using fallback TOGETHER_API_KEY")
+
+CARTESIA_API_KEY = os.getenv('CARTESIA_API_KEY')
+if not CARTESIA_API_KEY:
+    CARTESIA_API_KEY = 'sk_car_34TGYS5DnL1A3asyXEcZh4'
+
+# Final verification
+print(f"5. Final API Keys loaded: Together={bool(TOGETHER_API_KEY)}, Cartesia={bool(CARTESIA_API_KEY)}")
 
 SYSTEM_PROMPT = """
 You are a world-class podcast producer tasked with transforming the provided input text into an engaging and informative podcast script. The input may be unstructured or messy, sourced from PDFs or web pages. Your goal is to extract the most interesting and insightful content for a compelling podcast discussion.

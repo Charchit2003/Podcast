@@ -36,7 +36,7 @@ class PodcastProcessor:
         except Exception as e:
             raise Exception(f"Error transcribing audio: {str(e)}")
 
-    async def generate_summary(self, text: str) -> Tuple[str, List[str], List[str]]:
+    async def generate_summary(self, text: str) -> tuple[str, list[str], list[str]]:
         try:
             prompt = f"Summarize this podcast transcript:\n\n{text}"
             response = self.together_client.Complete.create(
