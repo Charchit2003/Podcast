@@ -39,6 +39,13 @@ HOST_VOICE_ID = "3cbf8fed-74d5-4690-b715-711fcf8d825f"
 GUEST_VOICE_ID = "6b92f628-be90-497c-8f4c-3b035002df71"
 MODEL_ID = "sonic-2"
 
+# Email Settings
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+SMTP_USERNAME = "charchitpaharia@gmail.com"  # Your Gmail address
+SMTP_PASSWORD = "wyec bcvc dysm yiqg"     # Gmail App Password
+DEFAULT_SENDER = "Your ChaiCast Service <charchitpaharia@gmail.com>"
+
 
 SYSTEM_PROMPT_CONVERSE = """
 You are a world-class podcast producer tasked with transforming the provided input text into an engaging and informative podcast script. The input may be unstructured or messy, sourced from PDFs or web pages. Your goal is to extract the most interesting and insightful content for a compelling podcast discussion.

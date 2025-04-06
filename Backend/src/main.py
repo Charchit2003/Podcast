@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks, File, UploadFile
+from fastapi import FastAPI, HTTPException, BackgroundTasks, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -117,6 +117,44 @@ async def process_anchor(
             transcript=script,
             summary=script.scriptNotes
         )
+    except Exception as e:
+        if 'temp_path' in locals():
+            os.remove(temp_path)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/process-and-email")
+async def process_and_email_podcast(
+    pdf_file: UploadFile = File(...),
+    email: str = Form(...),
+    is_anchor: bool = Form(False),
+    topic: Optional[str] = None,
+    language: str = "english"
+):
+    try:
+        # Save uploaded file temporarily
+        temp_path = UPLOAD_DIR / pdf_file.filename
+        with temp_path.open("wb") as buffer:
+            shutil.copyfileobj(pdf_file.file, buffer)
+        
+        # Process based on type
+        processor = anchor_processor if is_anchor else podcast_processor
+        
+        # Get content from PDF
+        input_text = await processor.get_PDF_text(str(temp_path))
+        
+        # Process and email
+        result = await processor.process_and_email(input_text, email)
+        
+        # Clean up
+        os.remove(temp_path)
+        
+        return {
+            "success": True,
+            "message": f"Content processed and emailed to {email}",
+            "audio_url": result["audio_path"],
+            "email_sent": result["email_sent"]
+        }
+        
     except Exception as e:
         if 'temp_path' in locals():
             os.remove(temp_path)
