@@ -56,62 +56,28 @@ class AnchorProcessor:
             print(f"Raw LLM response: {raw_response}")
             
             try:
-                # Parse JSON response with better error handling
                 json_response = json.loads(raw_response)
                 
-                # Handle case where response is a list
-                if isinstance(json_response, list):
-                    print("Warning: Received list instead of object, attempting to fix")
-                    # Try to find script and scriptNotes in the list
-                    script_items = [item for item in json_response if isinstance(item, dict) and "text" in item]
-                    script_notes = next((item for item in json_response if isinstance(item, str)), "")
+                if not isinstance(json_response, dict) or "script" not in json_response:
+                    raise ValueError("Invalid response format")
                     
-                    return AnchorScript(
-                        scriptNotes=script_notes,
-                        script=[
-                            AnchorLine(speaker="Anchor", text=item["text"])
-                            for item in script_items
-                        ]
-                    )
+                return AnchorScript(
+                    scriptNotes=json_response.get("scriptNotes", ""),
+                    script=[
+                        AnchorLine(
+                            speaker="Anchor",
+                            text=item["text"]
+                        ) for item in json_response["script"]
+                    ]
+                )
                 
-                # Handle case where response is a dict
-                elif isinstance(json_response, dict):
-                    if "script" not in json_response:
-                        # Try to extract script from the response
-                        script_items = []
-                        for key, value in json_response.items():
-                            if isinstance(value, dict) and "text" in value:
-                                script_items.append({"text": value["text"]})
-                            elif isinstance(value, str) and key != "scriptNotes":
-                                script_items.append({"text": value})
-                                
-                        return AnchorScript(
-                            scriptNotes=json_response.get("scriptNotes", ""),
-                            script=[
-                                AnchorLine(speaker="Anchor", text=item["text"])
-                                for item in script_items
-                            ]
-                        )
-                    else:
-                        # Normal case - proper structure
-                        return AnchorScript(
-                            scriptNotes=json_response.get("scriptNotes", ""),
-                            script=[
-                                AnchorLine(speaker="Anchor", text=item["text"])
-                                for item in json_response["script"]
-                            ]
-                        )
-                
-                else:
-                    raise ValueError(f"Unexpected response type: {type(json_response)}")
-                    
             except json.JSONDecodeError as json_error:
                 print(f"JSON parsing error: {str(json_error)}")
                 return self._create_fallback_script()
             except Exception as validation_error:
                 print(f"Validation error: {str(validation_error)}")
                 return self._create_fallback_script()
-                    
+                
         except Exception as e:
             raise Exception(f"Script generation failed: {str(e)}")
 
@@ -179,7 +145,9 @@ class AnchorProcessor:
                                 audio_chunks = ws.send(
                                     model_id=MODEL_ID,
                                     transcript=clean_text,
-                                    voice_id=HOST_VOICE_ID,  # Direct voice_id instead of voice object
+                                    voice={
+                                        "id" : HOST_VOICE_ID,
+                                        },  # Direct voice_id instead of voice object
                                     stream=True,
                                     output_format=output_format
                                 )
