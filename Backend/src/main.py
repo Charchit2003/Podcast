@@ -11,8 +11,10 @@ import pypdf
 import together
 import cartesia
 import ffmpeg
-from models.podcast import PodcastInput, PodcastOutput
+from models.podcast import PodcastInput, PodcastOutput 
+from models.anchor import AnchorOutput
 from utils.podcast_processor import PodcastProcessor
+from utils.anchor_processor import AnchorProcessor
 from dotenv import load_dotenv
 
 app = FastAPI()
@@ -43,8 +45,9 @@ async def root():
     return {"message": "Welcome to the API"}
 
 
-# Initialize podcast processor
-processor = PodcastProcessor()
+# Initialize processors
+podcast_processor = PodcastProcessor()
+anchor_processor = AnchorProcessor()
 
 # Create uploads directory
 UPLOAD_DIR = Path("uploads")
@@ -64,16 +67,16 @@ async def process_podcast(
             shutil.copyfileobj(pdf_file.file, buffer)
         
         # Get content from PDF
-        input_text = await processor.get_PDF_text(str(temp_path))
+        input_text = await podcast_processor.get_PDF_text(str(temp_path))
         
         # print(input_text)
 
         # Generate script
-        script = await processor.generate_script(input_text)
+        script = await podcast_processor.generate_podcast_script(input_text)
         print(script.script[0])
 
         # Generate audio
-        audio_path = await processor.generate_audio(script)
+        audio_path = await podcast_processor.generate_podcast_audio(script)
         
         # Only clean up the temporary PDF file
         background_tasks.add_task(os.remove, temp_path)
@@ -88,6 +91,37 @@ async def process_podcast(
         if 'temp_path' in locals():
             os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/process-anchor", response_model=AnchorOutput)
+async def process_anchor(
+    pdf_file: UploadFile = File(...),
+    topic: Optional[str] = None,
+    language: str = "english",
+    background_tasks: BackgroundTasks = None
+):
+    try:
+        temp_path = UPLOAD_DIR / pdf_file.filename
+        with temp_path.open("wb") as buffer:
+            shutil.copyfileobj(pdf_file.file, buffer)
+        
+        input_text = await anchor_processor.get_PDF_text(str(temp_path))
+        script = await anchor_processor.generate_script(input_text)
+        print(script.script[0])
+        
+        audio_path = await anchor_processor.generate_audio(script)
+        
+        background_tasks.add_task(os.remove, temp_path)
+        
+        return AnchorOutput(
+            audio_url=audio_path,
+            transcript=script,
+            summary=script.scriptNotes
+        )
+    except Exception as e:
+        if 'temp_path' in locals():
+            os.remove(temp_path)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

@@ -3,7 +3,7 @@ from typing import List, Literal, Optional
 from fastapi import UploadFile
 
 class LineItem(BaseModel):
-    speaker: Literal["Host (Jane)", "Guest"]
+    speaker: Literal["Host", "Guest"]
     text: str
 
 class Script(BaseModel):
