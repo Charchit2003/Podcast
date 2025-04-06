@@ -16,6 +16,7 @@ import subprocess
 import os
 import time
 import asyncio
+from utils.email_sender import send_podcast_email
 
 class PodcastProcessor:
     def __init__(self):
@@ -400,3 +401,29 @@ class PodcastProcessor:
             if os.path.exists(output_pcm):
                 os.remove(output_pcm)
             raise Exception(f"Audio generation failed: {str(e)}")
+
+    async def process_and_email(self, input_text: str, recipient_email: str) -> dict:
+        try:
+            # Generate script
+            script = await self.generate_podcast_script(input_text)
+            
+            # Generate audio
+            audio_path = await self.generate_podcast_audio(script)
+            
+            # Send email
+            email_sent = await send_podcast_email(
+                recipient_email=recipient_email,
+                audio_file_path=audio_path,
+                transcript=script.dict(),
+                is_anchor=False
+            )
+            
+            return {
+                "success": True,
+                "audio_path": audio_path,
+                "email_sent": email_sent,
+                "transcript": script
+            }
+            
+        except Exception as e:
+            raise Exception(f"Processing failed: {str(e)}")
