@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Literal, Optional
+from fastapi import UploadFile
 
 class LineItem(BaseModel):
     speaker: Literal["Host (Jane)", "Guest"]
@@ -11,10 +12,12 @@ class Script(BaseModel):
     script: List[LineItem]
 
 class PodcastInput(BaseModel):
-    url: str
     pdf_content: Optional[str] = None
     topic: Optional[str] = None
     language: Optional[str] = "english"
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class PodcastOutput(BaseModel):
     audio_url: str

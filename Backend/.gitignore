@@ -1,5 +1,8 @@
 .env
-.env/
 .env.local
 __pycache__/
 *.pyc
+uploads/
+output/
+*.wav
+*.pcm

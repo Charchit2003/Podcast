@@ -35,6 +35,11 @@ if not CARTESIA_API_KEY:
 # Final verification
 print(f"5. Final API Keys loaded: Together={bool(TOGETHER_API_KEY)}, Cartesia={bool(CARTESIA_API_KEY)}")
 
+HOST_VOICE_ID = "694f9389-aac1-45b6-b726-9d9369183238"
+GUEST_VOICE_ID = "a0e99841-438c-4a64-b679-ae501e7d6091"
+MODEL_ID = "sonic-2"
+
+
 SYSTEM_PROMPT = """
 You are a world-class podcast producer tasked with transforming the provided input text into an engaging and informative podcast script. The input may be unstructured or messy, sourced from PDFs or web pages. Your goal is to extract the most interesting and insightful content for a compelling podcast discussion.
 
@@ -90,6 +95,3 @@ IMPORTANT RULE: Each line of dialogue should be no more than 100 characters (e.g
 Remember: Always reply in valid JSON format, without code blocks. Begin directly with the JSON output.
 """  # Add the full system prompt here
 
-HOST_VOICE_ID = "694f9389-aac1-45b6-b726-9d9369183238"
-GUEST_VOICE_ID = "a0e99841-438c-4a64-b679-ae501e7d6091"
-MODEL_ID = "sonic-english"
