@@ -1,4 +1,28 @@
 import streamlit as st
+st.markdown("""
+    <style>
+    /* Sidebar radio buttons */
+    .stRadio > div > label {
+        font-size: 18px !important;
+    }
+
+    /* Sidebar link button text */
+    .stButton button {
+        font-size: 16px !important;
+    }
+
+    /* Headings (book titles, section headers) */
+    h1, h2, h3, h4 {
+        font-size: 26px !important;
+    }
+
+    /* Paragraph text (descriptions etc.) */
+    p, div[data-testid="stMarkdownContainer"] {
+        font-size: 16px !important;
+    }
+
+    </style>
+""", unsafe_allow_html=True)
 
 # Use experimental query param API
 query_params = st.query_params
@@ -141,7 +165,7 @@ genres = {
 
 # --- News categories (with placeholder images) ---
 news_categories = [
-    {"slug": "National Politics","label": "National Politics","image": "https://images.indianexpress.com/2023/05/ch1470490.jpg"},
+    {"slug": "Current Affairs","label": "Current Affairs","image": "https://images.indianexpress.com/2023/05/ch1470490.jpg"},
     {"slug": "Economy & Business","label": "Economy & Business", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmMiDdeXGeGb3DqFGV8E4xC-0E7UY5ZfTL7g&s"},
     {"slug": "Sports", "label": "Sports","image": "https://superblog.supercdn.cloud/site_cuid_clr6oh1no0006rmr89yhkxgu8/images/image-41-3-1712752581555-compressed.png"},
     {"slug": "Technology & Startups","label": "Technology & Startups","image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCZWh8B44IJwhKhbh3_H1t5YCFBbvWL-a0lw&s"},
@@ -165,15 +189,17 @@ def render_news():
     st.sidebar.button("Expert Advice", on_click=lambda: st.experimental_set_query_params(page="expert_advice"))
     st.sidebar.button("Daily News Update", on_click=lambda: st.experimental_set_query_params(page="daily_update"))
 
+    ##############
+
     # centered title without icon
-    st.markdown(
-        """
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="margin: 0; color: white;">News Categories</h2>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # st.markdown(
+    #     """
+    #     <div style="text-align: center; margin-bottom: 20px;">
+    #       <h2 style="margin: 0; color: white;">News Categories</h2>
+    #     </div>
+    #     """,
+    #     unsafe_allow_html=True,
+    # )
 
     for i in range(0, len(news_categories), 3):
         cols = st.columns(3)
@@ -182,43 +208,99 @@ def render_news():
             if idx < len(news_categories):
                 cat = news_categories[idx]
                 card_html = f"""
-                <a href="?page=category_{cat['slug']}" style="text-decoration:none;">
-                  <div style="
-                    border:1px solid #444;
-                    border-radius:10px;
-                    overflow:hidden;
-                    box-shadow:2px 2px 8px rgba(0,0,0,0.5);
-                    margin-bottom:20px;
-                    background:#1e1e1e;
-                    display:flex;
-                    flex-direction:column;
-                  ">
-                    <img src="{cat['image']}"
-                         style="
-                           width:100%;
-                           height:280px;           /* match your book cover height */
-                           object-fit:cover;
-                           display:block;
-                         ">
+                <a href="?page=category_{cat['slug']}" style="text-decoration: none;">
+                <div style="
+                    width: 100%;
+                    height: 360px;
+                    border: 1px solid #444;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+                    margin-bottom: 20px;
+                    background: #1e1e1e;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                ">
+                    <img src="{cat['image']}" style="
+                    width: 100%;
+                    height: 260px;
+                    object-fit: cover;
+                    display: block;
+                    ">
                     <div style="
-                           padding:10px;
-                           color:white;
-                           text-align:center;
-                           flex-grow:1;
-                           display:flex;
-                           align-items:flex-end;
-                           justify-content:center;
-                         ">
-                      <h4 style="margin:0; font-size:16px;">{cat['label']}</h4>
+                    padding: 12px;
+                    color: white;
+                    text-align: center;
+                    ">
+                    <h4 style="margin: 0; font-size: 16px;">{cat['label']}</h4>
                     </div>
-                  </div>
+                </div>
                 </a>
                 """
+
                 with cols[j]:
                     st.markdown(card_html, unsafe_allow_html=True)
 
+    # ✅ MOVE THE BUTTONS HERE
+    st.markdown(
+        """
+        <div style="text-align:center; margin-top: 30px;">
+            <a href="?page=newsletter" style="
+                background-color: #4CAF50;
+                color: white;
+                padding: 12px 25px;
+                text-align: center;
+                font-size: 18px;
+                border-radius: 8px;
+                text-decoration: none;
+                display: inline-block;
+                box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+                margin-bottom: 15px;
+            ">📩 Subscribe to Newsletter</a><br>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 
 #####
+# def render_category_page(slug):
+#     cat = next((c for c in news_categories if c["slug"] == slug), None)
+#     if not cat:
+#         st.error("Category not found.")
+#         return
+
+#     st.sidebar.link_button("⬅ Back to News", "?page=news")
+
+#     # Title + Image section
+#     st.markdown(
+#         f"""
+#         <div style="text-align: center; margin-bottom: 20px;">
+#             <h2 style="margin: 0; color: white;">{cat['label']}</h2>
+#             <img src="{cat['image']}" style="width: 50%; max-height: 300px; object-fit: cover; border-radius: 10px; margin-top: 15px;" />
+#         </div>
+#         """,
+#         unsafe_allow_html=True,
+#     )
+
+#     st.write(f"Display latest **{cat['label']}** articles here.")
+
+#     # 🎧 Audio for Current Affairs
+#     if slug == "Current Affairs":
+#         st.markdown("---")
+#         st.subheader("🎧 Listen to Audio Summary")
+
+#         audio_path = "audio/grouped_news.wav"
+#         try:
+#             with open(audio_path, "rb") as audio_file:
+#                 audio_bytes = audio_file.read()
+#                 st.audio(audio_bytes, format="audio/wav")
+#         except FileNotFoundError:
+#             st.warning("Audio file not found. Please check the file path.")
+
 def render_category_page(slug):
     cat = next((c for c in news_categories if c["slug"] == slug), None)
     if not cat:
@@ -227,17 +309,49 @@ def render_category_page(slug):
 
     st.sidebar.link_button("⬅ Back to News", "?page=news")
 
-    # Centered title without icon
+    # Title + Image
     st.markdown(
         f"""
-        <div style="text-align: center; margin-bottom: 15px;">
-          <h2 style="margin: 0; color: white;">{cat['label']}</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: white;">{cat['label']}</h2>
+            <img src="{cat['image']}" style="width: 50%; max-height: 300px; object-fit: cover; border-radius: 10px; margin-top: 15px;" />
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.write(f"Display latest **{cat['label']}** articles here.")
+    # 📄 Summary for Current Affairs
+    if slug == "Current Affairs":
+        summary = (
+        "Nationwide protests target Trump and Musk, while the Justice Department suspends an immigration attorney "
+        "after a deportation controversy. The U.S. revokes visas for South Sudanese nationals, and Israel admits errors "
+        "in Gaza airstrikes. Deadly storms and flash floods sweep across central states, causing significant damage. "
+        "In science, ancient DNA reveals lost human lineages, and SpaceX breaks new ground with polar orbit splashdowns, "
+        "marking a major milestone in private spaceflight. Microsoft ramps up AI efforts amid fierce tech competition, "
+        "and global tensions rise due to increasing trade tariffs, sweeping visa bans, growing geopolitical instability, "
+        "and widespread political unrest shaping international relations."
+    )
+
+        st.markdown(f"<p style='text-align: justify; font-size:16px;'>{summary}</p>", unsafe_allow_html=True)
+    else:
+        st.write(f"Display latest **{cat['label']}** articles here.")
+
+    # 🎧 Audio for Current Affairs
+    if slug == "Current Affairs":
+        st.markdown("---")
+        st.subheader("🎧 Listen to Audio Summary")
+
+        audio_path = "audio/grouped_news.wav"
+        try:
+            with open(audio_path, "rb") as audio_file:
+                audio_bytes = audio_file.read()
+                st.audio(audio_bytes, format="audio/wav")
+        except FileNotFoundError:
+            st.warning("Audio file not found. Please check the file path.")
+
+
+
+
 
 
 def render_expert_advice():
@@ -381,7 +495,25 @@ def render_book_page(title_slug):
 #     st.error("Page not found.")
 
 
+###############
 # --- Routing Logic ---
+# if page == "home":
+#     render_home()
+# elif page == "news":
+#     render_news()
+# elif page.startswith("category_"):
+#     render_category_page(page.split("_", 1)[1])
+# elif page == "expert_advice":
+#     render_expert_advice()
+# elif page == "daily_update":
+#     render_daily_update()
+# elif page == "audiobooks":
+#     render_audiobooks()
+# elif page.startswith("book_"):
+#     render_book_page(page[5:])
+# else:
+#     st.error("Page not found.")
+
 if page == "home":
     render_home()
 elif page == "news":
@@ -396,8 +528,29 @@ elif page == "audiobooks":
     render_audiobooks()
 elif page.startswith("book_"):
     render_book_page(page[5:])
+elif page == "newsletter":
+    st.sidebar.link_button("⬅ Back to News", "?page=news")
+    st.header("📬 Newsletter")
+    st.write("Subscribe to stay updated with weekly news highlights, expert opinions, and curated reads.")
+    st.success("Newsletter signup coming soon!")
+
+elif page == "hot_audio":
+    st.sidebar.link_button("⬅ Back to News", "?page=news")
+    st.header("🔥 Today's Hot Audio")
+
+    # Optional info
+    st.subheader("🎧 Featured Audio: Deep Work")
+    st.write("Today's featured audio is an excerpt from **Deep Work** by Cal Newport.")
+
+    try:
+        with open("audio/Deep Work.wav", "rb") as audio_file:
+            audio_bytes = audio_file.read()
+            st.audio(audio_bytes, format="audio/wav")
+    except FileNotFoundError:
+        st.warning("Audio file not found. Please place it in the `audio/` folder.")
 else:
     st.error("Page not found.")
+
 
 
 
